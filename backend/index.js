@@ -14,8 +14,8 @@ import orderRoutes from "./routes/order.routes.js";
 import { connectCloudinary } from "./config/cloudinary.js";
 
 const app = express();
-
-await connectCloudinary();
+ 
+await connectCloudinary(); 
 // allow multiple origins
 const allowedOrigins = ["http://localhost:5173"];
 //middlewares
@@ -36,4 +36,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   connectDB();
   console.log(`Server is running on port ${PORT}`);
-});
+});  

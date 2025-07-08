@@ -81,3 +81,31 @@ export const changeStock = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+// deleteProduct
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Product.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    return res.status(200).json({ success: true, message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+// updateProduct
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body;
+    const updated = await Product.findByIdAndUpdate(id, updatedData, { new: true });
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    return res.status(200).json({ success: true, message: "Product updated", product: updated });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

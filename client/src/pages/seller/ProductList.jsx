@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext";
-
+import { FaEdit, FaTrash } from "react-icons/fa";
 const ProductList = () => {
   const { products, fetchProducts, axios } = useAppContext();
 
@@ -17,6 +17,26 @@ const ProductList = () => {
       toast.success(error.message);
     }
   };
+const deleteProduct = async (id) => {
+  try {
+    const { data } = await axios.delete(`/api/product/delete/${id}`);
+    if (data.success) {
+      toast.success(data.message);
+      fetchProducts();
+    } else {
+      toast.error(data.message);
+    }
+  } catch (err) {
+    toast.error("Failed to delete product");
+  }
+};
+
+const editProduct = (product) => {
+  // You can navigate to an edit page or open a modal here
+  toast("Edit clicked for: " + product.name);
+};
+
+
   return (
     <div className="flex-1 py-10 flex flex-col justify-between">
       <div className="w-full md:p-10 p-4">
@@ -31,6 +51,8 @@ const ProductList = () => {
                   Selling Price
                 </th>
                 <th className="px-4 py-3 font-semibold truncate">In Stock</th>
+                <th className="px-4 py-3 font-semibold truncate">Edit</th>
+<th className="px-4 py-3 font-semibold truncate">Delete</th>
               </tr>
             </thead>
             <tbody className="text-sm text-gray-500">
@@ -50,7 +72,7 @@ const ProductList = () => {
                   </td>
                   <td className="px-4 py-3">{product.category}</td>
                   <td className="px-4 py-3 max-sm:hidden">
-                    ${product.offerPrice}
+                    ₹{product.offerPrice}
                   </td>
                   <td className="px-4 py-3">
                     <label className="relative inline-flex items-center cursor-pointer text-gray-900 gap-3">
@@ -67,6 +89,12 @@ const ProductList = () => {
                       <span className="dot absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-5"></span>
                     </label>
                   </td>
+                  <td className="px-4 py-3 text-blue-600 hover:underline cursor-pointer">
+  <FaEdit onClick={() => editProduct(product)} />
+</td>
+<td className="px-4 py-3 text-red-600 hover:underline cursor-pointer">
+  <FaTrash onClick={() => deleteProduct(product._id)} />
+</td>
                 </tr>
               ))}
             </tbody>
