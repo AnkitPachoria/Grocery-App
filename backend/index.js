@@ -3,45 +3,42 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { connectDB } from "./config/connectDB.js";
-import { connectCloudinary } from "./config/cloudinary.js";
+dotenv.config();
 import userRoutes from "./routes/user.routes.js";
 import sellerRoutes from "./routes/seller.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import orderRoutes from "./routes/order.routes.js";
+import { connectCloudinary } from "./config/cloudinary.js";
 
-dotenv.config();
 const app = express();
-await connectCloudinary();
 
-// Allowed origins list
+await connectCloudinary();
+await connectDB();
+
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://playful-jelly-3551a6.netlify.app"
+  "https://playful-jelly-3551a6.netlify.app",
+  // आप अपने अन्य frontend URLs भी यहाँ डाल सकते हैं
 ];
 
-// Dynamic CORS setup
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Postman जैसे tools के लिए
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = "CORS policy: Access denied from this origin.";
+      return callback(new Error(msg), false);
     }
+    return callback(null, true);
   },
   credentials: true,
-  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type","Authorization"]
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
 app.use(cookieParser());
 app.use(express.json());
 
-// API endpoints
 app.use("/images", express.static("uploads"));
 app.use("/api/user", userRoutes);
 app.use("/api/seller", sellerRoutes);
@@ -51,7 +48,6 @@ app.use("/api/address", addressRoutes);
 app.use("/api/order", orderRoutes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, "0.0.0.0", () => {
-  connectDB();
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
